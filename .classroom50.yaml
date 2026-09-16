@@ -1,0 +1,12 @@
+schema: "classroom50/repo-config/v1"
+classroom: "26-01-kd-dev-web-matin-c-mon-thu-kin"
+assignment: "exercice-4-2-mini-racco"
+owner:
+  username: "veben-cmyk"
+  id: 258487087
+  accepted_at: "2026-09-16T12:18:36Z"
+source:
+  owner: "kadea-academy-learners"
+  owner_id: 157120863
+  repo: "exercice-url-parser-adonis-js"
+  branch: "main"
