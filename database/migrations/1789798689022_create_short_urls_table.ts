@@ -14,8 +14,9 @@ export default class extends BaseSchema {
 
 
       // mes deux colones pour stocker l'url_long et le code court 
-      table.string('original_url')
-      table.string('short_code').unique()
+      // Utilisation de text() pour accepter les très longues URL et .notNullable()
+      table.text('original_url').notNullable()
+      table.string('short_code').notNullable().unique()
 
       // Ils servent à savoir :
       // created_at → quand l’enregistrement a été créé

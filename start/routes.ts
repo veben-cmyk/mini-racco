@@ -8,7 +8,10 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import ShortUrlsController from '#controllers/short_urls_controller'
 
-router.on('/').render('pages/home')
+router.get('/', [ShortUrlsController, 'index'])
 
-router.on('/result').render('pages/result')
+router.post('/shorten', [ShortUrlsController, 'shorten'])
+
+router.get('/:code', [ShortUrlsController, 'redirect'])
