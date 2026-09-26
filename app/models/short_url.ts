@@ -1,23 +1,16 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
-// je crée une classe appelée ShortUrl.
-// Elle représente ma table : short_urls
-
-// Modèle TypeScript  Table SQLite
-// ShortUrl ───────→  short_urls
-// Le modèle va permettre à mon application de lire et modifier les données de cette table.
-
-export default class ShortUrl extends BaseModel { 
-  // BaseModel est fourni par Lucid, l’ORM d’AdonisJS.
-  // ju donnes à ShortUrl les fonctionnalités nécessaires pour communiquer avec la base de données.
+export default class ShortUrl extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
-  @column()
+  // Fait le lien direct avec la colonne 'original_url' de PostgreSQL
+  @column({ columnName: 'original_url' })
   declare originalUrl: string
 
-  @column()
+  // Fait le lien direct avec la colonne 'short_code' de PostgreSQL
+  @column({ columnName: 'short_code' })
   declare shortCode: string
 
   @column.dateTime({ autoCreate: true })

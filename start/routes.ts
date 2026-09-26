@@ -8,10 +8,19 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import ShortUrlsController from '#controllers/short_urls_controller'
+const ShortUrlsController = () => import('#controllers/short_urls_controller')
 
-router.get('/', [ShortUrlsController, 'index'])
+// Page d'accueil : Affiche le formulaire
+router.get('/', [ShortUrlsController, 'index']).as('urls.home')
 
-router.post('/shorten', [ShortUrlsController, 'shorten'])
+// Traitement du formulaire : Enregistre en BDD
+router.post('/shorten', [ShortUrlsController, 'shorten']).as('urls.shorten')
 
-router.get('/:code', [ShortUrlsController, 'redirect'])
+// Page goToUrl : Affiche la page de test et la sidebar d'historique
+router.get('/go-to-url', [ShortUrlsController, 'goToUrl']).as('urls.goToUrl')
+
+// Suppression d'un lien
+router.post('/urls/:id', [ShortUrlsController, 'destroy']).as('urls.destroy')
+
+// Redirection dynamique via le shortCode (ex: localhost:3333/mon-code)
+router.get('/:code', [ShortUrlsController, 'redirect']).as('urls.redirect')

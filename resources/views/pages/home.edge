@@ -1,105 +1,66 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>
-      AdonisJS - A fully featured web framework for Node.js
-    </title>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <title>Raccourcisseur d'URL - Accueil</title>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link
-      href="https://fonts.bunny.net/css?family=instrument-sans:400,400i,500,500i,600,600i,700,700i"
-      rel="stylesheet"
-    />
+  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
 
-    <style>
-      :root {
-        --sand-1: #fdfdfc;
-        --sand-2: #f9f9f8;
-        --sand-3: #f1f0ef;
-        --sand-4: #e9e8e6;
-        --sand-5: #e2e1de;
-        --sand-6: #dad9d6;
-        --sand-7: #cfceca;
-        --sand-8: #bcbbb5;
-        --sand-9: #8d8d86;
-        --sand-10: #82827c;
-        --sand-11: #63635e;
-        --sand-12: #21201c;
-      }
-    </style>
+    <h1 class="text-3xl font-bold text-blue-600 mb-6 text-center">
+      Raccourcisseur d'URL
+    </h1>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <form action="{{ route('urls.shorten') }}" method="POST" class="space-y-4">
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: [ "Instrument Sans", "sans-serif" ]
-            },
-            colors: {
-              primary: {
-                DEFAULT: "#5A45FF",
-                lighter: "#a599ff"
-              },
-              sand: {
-                1: "var(--sand-1)",
-                2: "var(--sand-2)",
-                3: "var(--sand-3)",
-                4: "var(--sand-4)",
-                5: "var(--sand-5)",
-                6: "var(--sand-6)",
-                7: "var(--sand-7)",
-                8: "var(--sand-8)",
-                9: "var(--sand-9)",
-                10: "var(--sand-10)",
-                11: "var(--sand-11)",
-                12: "var(--sand-12)"
-              }
-            }
-          }
-        }
-      };
-    </script>
+      {{ csrfField() }}
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('dumper')
-  </head>
-  <body class="min-h-screen w-screen font-sans bg-sand-2 flex items-center justify-center p-4">
-    <header>
-    </header>
-    
-    <main class="w-full max-w-xl bg-white p-8 rounded-2xl border border-sand-5 shadow-sm">
-      <div class="space-y-6">
-        <div class="space-y-2 text-center">
-          <h1 class="text-3xl font-bold text-primary">
-            Bienvenue dans le raccourcisseur d'URL
-          </h1>
-          <p class="text-base text-sand-11">
-            Transforme une longue URL en un lien court, simple et facile à partager.
-          </p>
-        </div>
-
-        <form method="POST" action="/shorten" class="flex flex-col sm:flex-row gap-3">
-          {{ csrfField() }}
-          <input
-            type="url"
-            name="url"
-            placeholder="https://exemple.com/mon-long-lien"
-            required
-            class="flex-1 rounded-lg border border-sand-6 px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-          />
-
-          <button type="submit" class="rounded-lg bg-primary px-6 py-3 font-semibold text-white hover:opacity-90">
-            Raccourcir
-          </button>
-        </form>
+      <div>
+        <label for="url" class="block text-sm font-medium text-gray-700 mb-1">
+          Entrez l'URL complète :
+        </label>
+        <input
+          type="url"
+          id="url"
+          name="url"
+          required
+          placeholder="https://exemple.com"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
-    </main>
 
-    <footer>
-    </footer>
-  </body>
+      <div>
+        <label for="shortCode" class="block text-sm font-medium text-gray-700 mb-1">
+          Entrer le shortcode au choix :
+        </label>
+        <input
+          type="text"
+          id="shortCode"
+          name="shortCode"
+          required
+          placeholder="ex: mon-lien"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+        Envoyer l'URL
+      </button>
+
+    </form>
+
+    <hr class="my-6 border-gray-200">
+
+    <p class="text-center text-sm">
+      <a href="{{ route('urls.goToUrl') }}" class="text-blue-600 hover:underline">
+        Voir la liste des liens et tester mes redirections →
+      </a>
+    </p>
+
+  </div>
+
+</body>
 </html>
