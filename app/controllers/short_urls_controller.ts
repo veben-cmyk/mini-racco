@@ -52,12 +52,15 @@ export default class ShortUrlsController {
     }
 
     // 5. Supprimer un lien depuis la sidebar
-    async destroy({ params, response }: HttpContext) {
+    async destroy({ params, response, session }: HttpContext) {
     // Étape A : Trouver le lien par son ID 
     const record = await ShortUrl.findOrFail(params.id)
 
     // Étape B : Supprimer la ligne dans PostgreSQL
         await record.delete()
+
+    // On enregistre un message flash dans la session
+    session.flash('success', 'L\'URL a été supprimée avec succès !')
 
     // Étape C : Recharger la page goToUrl
         return response.redirect().toRoute('urls.goToUrl')

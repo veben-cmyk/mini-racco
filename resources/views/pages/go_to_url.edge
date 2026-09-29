@@ -13,9 +13,17 @@
 
     <!-- 1. ZONE PRINCIPALE : Zone de test -->
         <main class="md:col-span-1 bg-white shadow-md rounded-xl p-6 h-fit">
+
+    {{-- message de confrimation --}}
+            @if(flashMessages.has('success'))
+                <div class="alert alert-success" style="color: green; background-color: #e6fffa; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                    {{ flashMessages.get('success') }}
+                </div>
+            @endif
+
             <h1 class="text-2xl font-bold text-gray-800 mb-2">Tester une URL courte</h1>
             <p class="text-sm text-gray-600 mb-4">
-                Tapez votre code court ci-dessous pour tester la redirection :
+                phrase à encoder:
             </p>
 
             <input
@@ -26,7 +34,7 @@
             <button
                 onclick="window.open('/' + document.getElementById('testCode').value, '_blank')"
                 class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
-                Accéder
+                Envoyer le mot-clé
             </button>
 
             <hr class="my-6 border-gray-200">
@@ -55,7 +63,8 @@
                     </a>
                 </p>
 
-            <form action="{{ route('urls.destroy', { id: url.id }) }}" method="POST" class="mt-2">
+            <form action="{{ route('urls.destroy', { id: url.id }) }}" method="POST" class="mt-2"
+            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette URL ?')">
                 {{ csrfField() }}
                 <button type="submit" class="text-sm text-red-600 hover:underline font-medium">
                     Supprimer
