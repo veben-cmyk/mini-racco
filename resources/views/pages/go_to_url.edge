@@ -29,7 +29,7 @@
             <input
                 type="text"
                 id="testCode"
-                placeholder="ex: mon-lien"
+                placeholder="ex: Code court "
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button
                 onclick="window.open('/' + document.getElementById('testCode').value, '_blank')"
@@ -54,7 +54,11 @@
 
             <div class="flex-1 min-w-0">
                 <p class="text-sm text-gray-800">
-                <strong>Code court :</strong> {{ url.shortCode }}
+                    <strong>Code court :</strong> {{ url.shortCode }}
+                </p class="text-sm text-gray-800">
+                    <strong>mon lien racourci :</strong>http://localhost:3333/{{ url.shortCode }}
+                <p>
+
                 </p>
                 <p class="text-sm text-gray-800 truncate">
                     <strong>URL Cible :</strong>
