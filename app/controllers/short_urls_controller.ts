@@ -1,39 +1,75 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import ShortUrl from '#models/short_url'
+import string from '@adonisjs/core/helpers/string'
 
 export default class ShortUrlsController {
-    // 1. afficher la page d'accueil
-    async index({view}: HttpContext){
-        return view.render('pages/home')
+
+  // 1. Page d'accueil
+    async index({ view }: HttpContext) {
+    return view.render('pages/home')
     }
 
-    // 2. Traiter le formulaire et sauvegarder en BDD
-    async shorten({ request, response }: HttpContext) {
-    // Étape A : Extraction des données du formulaire
-    const originalUrl = request.input('url')
-    const customShortCode = request.input('shortCode')
+  // 2. Création de l'URL
+    async shorten({ request, response, auth, session }: HttpContext) {
+        const originalUrl = request.input('url')
+        const customShortCode = request.input('shortCode')
 
-    // Étape B : Enregistrement dans PostgreSQL via le modèle ShortUrl
+    // Tente de récupérer l'utilisateur connecté (si disponible)
+    await auth.check()
+    const user = auth.user
+
+    // Code court personnalisé ou généré
+    const shortCode = customShortCode && customShortCode.trim() !== ''
+        ? customShortCode
+        : string.generateRandom(6)
+
+    // Vérification des doublons sur le code court
+    const existing = await ShortUrl.findBy('shortCode', shortCode)
+    if (existing) {
+        session.flash('errors', { shortCode: 'Ce code court est déjà utilisé. Choisis-en un autre !' })
+        return response.redirect().back()
+    }
+
+    // Création de l'enregistrement
     const shortUrlRecord = new ShortUrl()
     shortUrlRecord.originalUrl = originalUrl
-    shortUrlRecord.shortCode = customShortCode
+    shortUrlRecord.shortCode = shortCode
+
+    // Association STRICTE à l'utilisateur si connecté
+    if (user) {
+        shortUrlRecord.userId = user.id
+    }
+
     await shortUrlRecord.save()
 
-    // Étape C : Redirection vers la page goToUrl
+    session.flash('success', 'URL créée avec succès !')
     return response.redirect().toRoute('urls.goToUrl')
     }
 
-    // 3. Afficheur de la page goToUrl (avec la liste BDD pour la sidebar)
-    async goToUrl({ view }: HttpContext) {
-    // Étape A : Récupération de tous les enregistrements
-    const urls = await ShortUrl.all()
+  // 3. Affichage de la liste des liens (go_to_url)
+    async goToUrl({ view, auth }: HttpContext) {
+    // Vérifie l'état de connexion actuel
+        await auth.check()
+        const user = auth.user
 
-    // Étape B : Rendu de la vue avec injection des données
-        return view.render('pages/go_to_url', { urls })
+        let urls: ShortUrl[] = []
+
+    if (user) {
+      // SI CONNECTÉ : Charge UNIQUEMENT les liens créés par cet utilisateur précis
+        urls = await ShortUrl.query()
+        .where('userId', user.id)
+        .orderBy('createdAt', 'desc')
+    } else {
+      // SI NON CONNECTÉ : Seuls les liens anonymes (userId NULL) sont affichés
+        urls = await ShortUrl.query()
+        .whereNull('userId')
+        .orderBy('createdAt', 'desc')
     }
 
-    
-    // 4. Rediriger l'utilisateur vers le site d'origine
+    return view.render('pages/go_to_url', { urls })
+}
+
+  // 4. Redirection vers l'URL d'origine
     async redirect({ params, response }: HttpContext) {
     const record = await ShortUrl.findBy('shortCode', params.code)
 
@@ -41,29 +77,36 @@ export default class ShortUrlsController {
         return response.notFound('URL non trouvée')
     }
 
-    let targetUrl = record.originalUrl
-
-    // On s'assure que l'URL est bien absolue pour forcer la redirection externe
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        let targetUrl = record.originalUrl
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
         targetUrl = 'https://' + targetUrl
+        }
+
+        return response.redirect().toPath(targetUrl)
     }
 
-    return response.redirect(targetUrl)
+  // 5. Suppression sécurisée
+    async destroy({ params, response, session, auth }: HttpContext) {
+        await auth.check()
+        const user = auth.user
+
+        const query = ShortUrl.query().where('id', params.id)
+
+        if (user) {
+            query.where('userId', user.id)
+        } else {
+            query.whereNull('userId')
+        }
+
+        const record = await query.first()
+
+        if (record) { 
+            await record.delete()
+            session.flash('success', 'L\'URL a été supprimée avec succès !')
+        } else {
+        session.flash('errors', { destroy: 'Vous n\'avez pas la permission de supprimer cette URL.' })
+        }
+
+    return response.redirect().back()
     }
-
-    // 5. Supprimer un lien depuis la sidebar
-    async destroy({ params, response, session }: HttpContext) {
-    // Étape A : Trouver le lien par son ID 
-    const record = await ShortUrl.findOrFail(params.id)
-
-    // Étape B : Supprimer la ligne dans PostgreSQL
-        await record.delete()
-
-    // On enregistre un message flash dans la session
-    session.flash('success', 'L\'URL a été supprimée avec succès !')
-
-    // Étape C : Recharger la page goToUrl
-        return response.redirect().toRoute('urls.goToUrl')
-    }
-
 }

@@ -10,6 +10,18 @@
 import router from '@adonisjs/core/services/router'
 const ShortUrlsController = () => import('#controllers/short_urls_controller')
 
+const AuthController = () => import('#controllers/auth_controller')
+
+
+// Routes Invités (non connectés)
+router.get('/register', [AuthController, 'renderRegister'])
+router.post('/register', [AuthController, 'register'])
+router.get('/login', [AuthController, 'renderLogin'])
+router.post('/login', [AuthController, 'login'])
+
+// Route Déconnexion
+router.post('/logout', [AuthController, 'logout'])
+
 // Page d'accueil : Affiche le formulaire
 router.get('/', [ShortUrlsController, 'index']).as('urls.home')
 
@@ -24,3 +36,5 @@ router.post('/urls/:id', [ShortUrlsController, 'destroy']).as('urls.destroy')
 
 // Redirection dynamique via le shortCode (ex: localhost:3333/mon-code)
 router.get('/:code', [ShortUrlsController, 'redirect']).as('urls.redirect')
+
+

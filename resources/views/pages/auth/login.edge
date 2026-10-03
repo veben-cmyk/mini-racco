@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Mini Racco</title>
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex items-center justify-center p-6">
+
+  <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    
+    <!-- En-tête -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-slate-900 mb-1">Connexion</h1>
+      <p class="text-sm text-slate-500">Accédez à votre espace Mini Racco</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    @if(flashMessages.has('errors.login'))
+      <div class="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+        {{ flashMessages.get('errors.login') }}
+      </div>
+    @endif
+
+    <!-- Formulaire de connexion -->
+    <form action="/login" method="POST" class="space-y-5">
+      {{ csrfField() }}
+
+      <div>
+        <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">
+          Adresse email
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="nom@exemple.com" 
+          required
+          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all"
+        >
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">
+          Mot de passe
+        </label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="••••••••" 
+          required
+          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all"
+        >
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm mt-2"
+      >
+        Se connecter
+      </button>
+    </form>
+
+    <!-- Pied de carte -->
+    <div class="mt-6 text-center text-sm text-slate-500">
+      Pas encore de compte ? 
+      <a href="/register" class="text-indigo-600 font-semibold hover:underline ml-1">
+        S'inscrire
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>
