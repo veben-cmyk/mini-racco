@@ -16,12 +16,24 @@
         <p class="text-sm text-slate-500">Rejoignez Mini Racco pour gérer vos liens</p>
     </div>
 
-    <!-- Message d'erreur -->
-    @if(flashMessages.has('errors.login'))
-        <div class="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
-        {{ flashMessages.get('errors.login') }}
-        </div>
-    @endif
+        {{-- Messages de l'inspecteur, une case après l'autre --}}
+    @inputError('username')
+      @each(message in $messages)
+        <div class="mb-3 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{{ message }}</div>
+      @end
+    @end
+
+    @inputError('email')
+      @each(message in $messages)
+        <div class="mb-3 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{{ message }}</div>
+      @end
+    @end
+
+    @inputError('password')
+      @each(message in $messages)
+        <div class="mb-3 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{{ message }}</div>
+      @end
+    @end
 
     <!-- Formulaire d'inscription -->
     <form action="/register" method="POST" class="space-y-5">

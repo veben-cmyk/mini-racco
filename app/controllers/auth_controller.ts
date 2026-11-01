@@ -1,6 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 
+// L'inspecteur du formulaire d'inscription
+import { registerValidator } from '#validators/user'
+
 export default class AuthController {
 /**
    * Afficher la page d'inscription
@@ -9,23 +12,25 @@ export default class AuthController {
         return view.render('pages/auth/register')
     }
 
-    /**
+      /**
    * Traiter l'inscription
    */
-    async register({ request, response, session }: HttpContext) {
+  async register({ request, response, session }: HttpContext) {
+    // 1. On confie le formulaire à l'inspecteur.
+    //    Refusé : retour automatique au formulaire avec les erreurs.
+    //    Accepté : on récupère username, email et password vérifiés.
+    const data = await request.validateUsing(registerValidator)
 
-    // 1. Récupération des données du formulaire
-        const data = request.only(['username', 'email', 'password'])
+    // 2. Création de l'utilisateur, avec le rôle "user" attribué explicitement.
+    //    Le mot de passe est haché automatiquement par le modèle User (withAuthFinder).
+    await User.create({ ...data, role: 'user' })
 
-    // 2. Création de l'utilisateur
-            await User.create(data)
+    // 3. Message de succès affiché sur la page de connexion
+    session.flash('success', 'Ton compte a été créé ! Connecte-toi maintenant.')
 
-    // 3. Connexion automatique de l'utilisateur après inscription
-        session.flash('success', 'Votre compte a été créé ! Connectez-vous maintenant.')
-
-    // 4. Redirection vers la page d'accueil ou le dashboard
-        return response.redirect().toPath('/login')
-    }
+    // 4. Redirection vers la page de connexion
+    return response.redirect().toPath('/login')
+  }
 
     /**
    * Afficher la page de connexion
