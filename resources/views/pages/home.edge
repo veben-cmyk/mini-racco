@@ -21,11 +21,23 @@
       </div>
     @endif
 
-    @if(flashMessages.has('errors.shortCode'))
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm text-center">
-        {{ flashMessages.get('errors.shortCode') }}
-      </div>
-    @endif
+    {{-- Messages de l'inspecteur pour la case URL (s'il y en a) --}}
+@inputError('url')
+  @each(message in $messages)
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm text-center">
+      {{ message }}
+    </div>
+  @end
+@end
+
+{{-- Messages de l'inspecteur pour la case code (s'il y en a) --}}
+@inputError('shortCode')
+  @each(message in $messages)
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm text-center">
+      {{ message }}
+    </div>
+  @end
+@end
 
     <form action="/shorten" method="POST" class="space-y-4">
 
