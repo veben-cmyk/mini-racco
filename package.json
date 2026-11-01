@@ -64,6 +64,7 @@
     "better-sqlite3": "^13.0.3",
     "edge.js": "^6.2.1",
     "luxon": "^3.7.2",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "tailwindcss": "^4.3.3"

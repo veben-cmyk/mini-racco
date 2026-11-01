@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
 
       // Nos 2 colonnes principales
-      table.string('original_url').notNullable()
+      table.text('original_url').notNullable()
       table.string('short_code').notNullable().unique()
 
       

@@ -38,3 +38,4 @@ router.post('/urls/:id', [ShortUrlsController, 'destroy']).as('urls.destroy')
 router.get('/:code', [ShortUrlsController, 'redirect']).as('urls.redirect')
 
 
+
