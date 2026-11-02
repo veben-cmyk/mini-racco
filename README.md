@@ -17,7 +17,10 @@
 <!-- Statut : la seule touche de bleu calque -->
 <p align="center">
   <img src="https://img.shields.io/badge/statut-en%20d%C3%A9veloppement-2348c4?style=for-the-badge" alt="Statut : en développement">
-  <img src="https://img.shields.io/badge/d%C3%A9mo-bient%C3%B4t-5c5e64?style=for-the-badge" alt="Démo : bientôt">
+    <!-- Badge démo : cliquable, mène vers l'app en ligne -->
+  <a href="https://mini-racco.onrender.com">
+    <img src="https://img.shields.io/badge/d%C3%A9mo-en%20ligne-2348c4?style=for-the-badge" alt="Démo en ligne">
+  </a>
 </p>
 
 <!-- Technologies : tout en graphite, avec leur logo en blanc -->
@@ -121,7 +124,7 @@ start/
 ## Prochaines étapes
 
 - [ ] Réinitialisation du mot de passe par email
-- [ ] Mise en ligne
+- [✅] Mise en ligne : [https://mini-racco.onrender.com]
 - [ ] Limitation des tentatives de connexion
 - [ ] Tests automatisés de l'authentification
 
