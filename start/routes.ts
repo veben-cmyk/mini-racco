@@ -11,6 +11,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 const AdminController = () => import('#controllers/admin_controller')
 const ShortUrlsController = () => import('#controllers/short_urls_controller')
+const PasswordResetController = () => import('#controllers/password_reset_controller')
 
 const AuthController = () => import('#controllers/auth_controller')
 
@@ -64,6 +65,16 @@ router
 // Accueil : visible par tous, la création d'un lien exigera d'être connecté
 // Page d'accueil : Affiche le formulaire
 router.get('/', [ShortUrlsController, 'index']).as('urls.home')
+
+    // --- Mot de passe oublié ---
+    // Page "Mot de passe oublié" : une case pour l'email
+    router.get('/forgot-password', [PasswordResetController, 'showForgot']).as('password.forgot')
+    // Envoi du lien par email
+    router.post('/forgot-password', [PasswordResetController, 'sendResetLink']).as('password.email')
+    // Lien reçu par email : formulaire du nouveau mot de passe
+    router.get('/reset-password/:token', [PasswordResetController, 'showReset']).as('password.reset')
+    // Enregistrement du nouveau mot de passe
+    router.post('/reset-password/:token', [PasswordResetController, 'resetPassword']).as('password.update')
 
 
 // Redirection dynamique via le shortCode (ex: localhost:3333/mon-code)

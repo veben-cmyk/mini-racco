@@ -59,3 +59,44 @@ registerValidator.messagesProvider = new SimpleMessagesProvider({
   'password.minLength': 'Le mot de passe doit contenir au moins 8 caractères.',
   'password.maxLength': 'Le mot de passe ne peut pas dépasser 64 caractères.',
 })
+/**
+ * Inspecteur du formulaire "Mot de passe oublié" : une seule case, l'email.
+ * On ne vérifie PAS que l'email existe en base : ce serait révéler
+ * à n'importe qui si une adresse a un compte chez nous.
+ */
+export const forgotPasswordValidator = vine.compile(
+  vine.object({
+    email: vine
+      .string()
+      .trim()
+      .email()
+      .toLowerCase(), // même règle qu'à l'inscription et à la connexion
+  })
+)
+
+forgotPasswordValidator.messagesProvider = new SimpleMessagesProvider({
+  'email.required': 'Merci de saisir ton adresse email.',
+  'email.email': "Cette adresse email n'est pas valide.",
+})
+
+/**
+ * Inspecteur du formulaire "Nouveau mot de passe".
+ * confirmed() exige un second champ "password_confirmation" identique :
+ * c'est ce qui détecte une faute de frappe dans le mot de passe.
+ */
+export const resetPasswordValidator = vine.compile(
+  vine.object({
+    password: vine
+      .string()
+      .minLength(8) // mêmes règles qu'à l'inscription
+      .maxLength(64)
+      .confirmed(), // doit être identique à password_confirmation
+  })
+)
+
+resetPasswordValidator.messagesProvider = new SimpleMessagesProvider({
+  'password.required': 'Merci de choisir un nouveau mot de passe.',
+  'password.minLength': 'Le mot de passe doit contenir au moins 8 caractères.',
+  'password.maxLength': 'Le mot de passe ne peut pas dépasser 64 caractères.',
+  'password.confirmed': 'Les deux mots de passe ne sont pas identiques.',
+})
