@@ -1,111 +1,92 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tester mon URL & Historique</title>
+{{--
+  Page "Mes liens" : direction A "Feuille".
+  Le contrôleur envoie "liens" : une liste déjà préparée
+  (lien court complet, QR code, date lisible).
+--}}
+@layout({ title: 'Mes liens' })
 
-    {{-- Chargement CSS/JS avec Vite --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-100 min-h-screen p-6 font-sans">
-    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="max-w-3xl mx-auto flex flex-col gap-10">
 
-    <!-- 1. ZONE PRINCIPALE : Zone de test -->
-        <main class="md:col-span-1 bg-white shadow-md rounded-xl p-6 h-fit">
-
-    {{-- message de confrimation --}}
-            @if(flashMessages.has('success'))
-                <div class="alert alert-success" style="color: green; background-color: #e6fffa; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-                    {{ flashMessages.get('success') }}
-                </div>
-            @endif
-
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">Tester une URL courte</h1>
-            <p class="text-sm text-gray-600 mb-4">
-                phrase à encoder:
-            </p>
-
-            <input
-                type="text"
-                id="testCode"
-                placeholder="ex: Code court "
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button
-                onclick="window.open('/' + document.getElementById('testCode').value, '_blank')"
-                class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
-                Envoyer le mot-clé
-            </button>
-
-            <hr class="my-6 border-gray-200">
-
-            <a href="{{ route('urls.home') }}" class="text-sm text-blue-600 hover:underline inline-block">
-                ← Retour au formulaire d'accueil
-            </a>
-        </main>
-
-    <!-- 2. SIDEBAR : Historique dynamique des liens -->
-        <aside class="md:col-span-2 bg-white shadow-md rounded-xl p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Historique des liens</h2>
-
-            <div class="space-y-4">
-            @each(url in urls)
-                <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between gap-4">
-
-            <div class="flex-1 min-w-0">
-                <p class="text-sm text-gray-800">
-                    <strong>Code court :</strong> {{ url.shortCode }}
-                </p class="text-sm text-gray-800">
-                    <strong>mon lien racourci :</strong>http://localhost:3333/{{ url.shortCode }}
-                <p>
-
-                </p>
-                <p class="text-sm text-gray-800 truncate">
-                    <strong>URL Cible :</strong>
-                    <a href="{{ url.originalUrl }}" target="_blank" class="text-blue-600 hover:underline">
-                    {{ url.originalUrl }}
-                    </a>
-                </p>
-
-            {{-- Actions sur le lien : modifier ou supprimer --}}
-            <div class="mt-2 flex items-center gap-4">
-              {{-- Lien vers le formulaire de modification --}}
-              <a href="{{ route('urls.edit', { id: url.id }) }}" class="text-sm text-blue-600 hover:underline font-medium">
-                Modifier
-              </a>
-
-              {{--
-                Suppression : POST déguisé en DELETE grâce à ?_method=DELETE.
-                onsubmit (et non onclick) : la confirmation s'affiche au moment de l'envoi.
-              --}}
-              <form action="{{ route('urls.destroy', { id: url.id }) }}?_method=DELETE" method="POST"
-                onsubmit="return confirm('Supprimer ce lien ?')">
-                {{ csrfField() }}
-                <button type="submit" class="text-sm text-red-600 hover:underline font-medium">
-                  Supprimer
-                </button>
-              </form>
-            </div>
-                
-            </div>
-
-            <!-- QR Code dynamique -->
-            <div class="shrink-0">
-                <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ url.originalUrl }}"
-                alt="QR Code pour {{ url.shortCode }}"
-                class="w-24 h-24 rounded border border-gray-200">
-            </div>
-
-            </div>
-            @else
-            <p class="text-sm text-gray-500">Aucune URL enregistrée pour le moment.</p>
-            @endeach
-            </div>
-
-        </aside>
-
+    {{-- ===== En-tête de la page ===== --}}
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="flex flex-col gap-2">
+        <p class="font-display font-semibold text-xs tracking-[0.14em] text-graphite-doux">MES LIENS</p>
+        <h1 class="font-display font-semibold text-3xl">
+          {{-- Accord du pluriel : "1 lien" / "3 liens" --}}
+          {{ liens.length }} {{ liens.length > 1 ? 'liens' : 'lien' }}
+        </h1>
+      </div>
+      {{-- L'action principale de la page : la seule en bleu --}}
+      <a href="{{ route('urls.home') }}" class="px-5 py-3 rounded-xl bg-calque text-white font-semibold hover:opacity-90">
+        Nouveau lien
+      </a>
     </div>
 
-</body>
-</html>
+    {{-- Erreur éventuelle (ex. : tentative de supprimer le lien d'un autre) --}}
+    @if(flashMessages.has('errors.destroy'))
+      <p class="px-4 py-3 rounded-xl bg-papier-releve border border-trait text-erreur text-sm">
+        {{ flashMessages.get('errors.destroy') }}
+      </p>
+    @end
+
+    {{-- ===== La liste ===== --}}
+    <div class="flex flex-col gap-4">
+      @each(lien in liens)
+        {{-- Une carte par lien : infos à gauche, QR code à droite --}}
+        <article class="flex flex-wrap rounded-xl bg-papier-releve border border-trait">
+
+          {{-- Partie gauche : les informations et les actions --}}
+          <div class="flex-[999_1_320px] min-w-0 p-6 flex flex-col gap-4">
+
+            {{-- Le lien court, en police code et en bleu --}}
+            <a href="{{ lien.shortUrl }}" target="_blank" class="font-mono text-lg text-calque break-all hover:underline">
+              {{ lien.shortUrl }}
+            </a>
+
+            {{-- L'adresse d'origine, plus discrète (tronquée si trop longue) --}}
+            <div class="flex flex-col gap-1">
+              <p class="text-[13px] font-medium text-graphite-doux">Adresse d'origine · créé le {{ lien.createdAt }}</p>
+              <p class="text-[15px] text-graphite-doux truncate" title="{{ lien.originalUrl }}">{{ lien.originalUrl }}</p>
+            </div>
+
+            {{-- Les actions, séparées par un filet --}}
+            <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-trait text-[15px]">
+              {{-- data-copy : le script dans app.js copie ce texte au clic --}}
+              <button type="button" data-copy="{{ lien.shortUrl }}"
+                class="px-4 py-2 rounded-xl border border-trait font-medium hover:border-graphite cursor-pointer">
+                Copier
+              </button>
+
+              <a href="{{ route('urls.edit', { id: lien.id }) }}" class="font-medium hover:text-calque">Modifier</a>
+
+              {{-- Suppression : POST déguisé en DELETE, avec confirmation --}}
+              <form action="{{ route('urls.destroy', { id: lien.id }) }}?_method=DELETE" method="POST"
+                onsubmit="return confirm('Supprimer ce lien ?')">
+                {{ csrfField() }}
+                <button type="submit" class="font-medium text-erreur hover:underline cursor-pointer">Supprimer</button>
+              </form>
+            </div>
+          </div>
+
+          {{-- Partie droite : le QR code, généré par notre serveur --}}
+          <div class="flex-[1_1_180px] p-6 border-l border-trait flex flex-col items-center justify-center gap-3">
+            <img src="{{ lien.qrCode }}" alt="QR code du lien {{ lien.shortCode }}" class="w-32 h-32">
+            {{-- L'attribut download fait télécharger l'image au lieu de l'ouvrir --}}
+            <a href="{{ lien.qrCode }}" download="qr-{{ lien.shortCode }}.png" class="text-[13px] font-medium text-calque hover:underline">
+              Télécharger le QR code
+            </a>
+          </div>
+        </article>
+
+      @else
+        {{-- @else d'un @each : affiché quand la liste est vide --}}
+        <div class="py-16 text-center flex flex-col items-center gap-3 border border-dashed border-trait rounded-xl">
+          <p class="font-display font-semibold text-xl">Aucun lien pour l'instant</p>
+          <p class="text-graphite-doux">Crée ton premier lien court depuis l'accueil.</p>
+        </div>
+      @end
+    </div>
+
+  </div>
+
+@end

@@ -3,6 +3,8 @@ import ShortUrl from '#models/short_url'
 import string from '@adonisjs/core/helpers/string'
 // L'inspecteur qui vérifie le formulaire de création
 import { shortenUrlValidator, updateUrlValidator } from '#validators/short_url'
+// Génère les QR codes sur notre serveur (aucun service externe)
+import QRCode from 'qrcode'
 
 export default class ShortUrlsController {
   /**
@@ -43,10 +45,11 @@ export default class ShortUrlsController {
     return response.redirect().toRoute('urls.goToUrl')
   }
 
+
   /**
    * 3. Liste des liens de l'utilisateur connecté (route protégée)
    */
-  async goToUrl({ view, auth }: HttpContext) {
+  async goToUrl({ view, auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
 
     // On ne charge QUE les liens de cet utilisateur, du plus récent au plus ancien
@@ -54,7 +57,27 @@ export default class ShortUrlsController {
       .where('userId', user.id)
       .orderBy('createdAt', 'desc')
 
-    return view.render('pages/go_to_url', { urls })
+    // Adresse de base du site, par exemple "http://localhost:3333"
+    const baseUrl = `${request.protocol()}://${request.host()}`
+
+    // Pour chaque lien, on prépare ce dont la vue a besoin :
+    // le lien court complet et son QR code (une image encodée en texte, dite "data URL").
+    // Promise.all lance toutes les générations en même temps, au lieu d'attendre l'une après l'autre.
+    const liens = await Promise.all(
+      urls.map(async (url) => {
+        const shortUrl = `${baseUrl}/${url.shortCode}`
+        return {
+          id: url.id,
+          originalUrl: url.originalUrl,
+          shortCode: url.shortCode,
+          shortUrl,
+          qrCode: await QRCode.toDataURL(shortUrl, { margin: 1, width: 160 }),
+          createdAt: url.createdAt.toFormat('dd/MM/yyyy'), // date lisible : 02/11/2026
+        }
+      })
+    )
+
+    return view.render('pages/go_to_url', { liens })
   }
 
 /**
