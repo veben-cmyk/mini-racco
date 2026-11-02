@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import ShortUrl from '#models/short_url'
 import string from '@adonisjs/core/helpers/string'
 // L'inspecteur qui vérifie le formulaire de création
-import { shortenUrlValidator } from '#validators/short_url'
+import { shortenUrlValidator, updateUrlValidator } from '#validators/short_url'
 
 export default class ShortUrlsController {
   /**
@@ -70,7 +70,50 @@ export default class ShortUrlsController {
   }
 
   /**
-   * 5. Suppression d'un lien (route protégée)
+   * 5. Afficher le formulaire de modification d'un lien (route protégée)
+   */
+  async edit({ params, view, auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    // On cherche le lien par son id ET par son propriétaire.
+    // S'il n'existe pas ou appartient à quelqu'un d'autre : page 404 automatique.
+    const shortUrl = await ShortUrl.query()
+      .where('id', params.id)
+      .where('userId', user.id)
+      .firstOrFail()
+
+    // On envoie le lien à la vue pour pré-remplir le formulaire
+    return view.render('pages/edit_url', { shortUrl })
+  }
+
+  /**
+   * 6. Enregistrer la modification d'un lien (route protégée)
+   */
+  async update({ params, request, response, session, auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    // Même vérification que dans edit : le lien doit être à cet utilisateur
+    const shortUrl = await ShortUrl.query()
+      .where('id', params.id)
+      .where('userId', user.id)
+      .firstOrFail()
+
+    // On confie le formulaire à l'inspecteur de modification,
+    // avec une note (meta) : l'id du lien, pour qu'il ne se compte pas lui-même comme doublon
+    const { url, shortCode } = await request.validateUsing(updateUrlValidator, {
+      meta: { urlId: shortUrl.id },
+    })
+
+    // On remplace les anciennes valeurs par les nouvelles, puis on enregistre
+    shortUrl.merge({ originalUrl: url, shortCode })
+    await shortUrl.save()
+
+    session.flash('success', 'Le lien a été modifié avec succès !')
+    return response.redirect().toRoute('urls.goToUrl')
+  }
+
+  /**
+   * 7. Suppression d'un lien (route protégée)
    * Un utilisateur ne peut supprimer QUE ses propres liens.
    */
   async destroy({ params, response, session, auth }: HttpContext) {

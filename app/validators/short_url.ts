@@ -49,3 +49,57 @@ shortenUrlValidator.messagesProvider = new SimpleMessagesProvider({
   'shortCode.notIn': 'Ce code est réservé, choisis-en un autre.',
   'shortCode.database.unique': 'Ce code est déjà utilisé, choisis-en un autre.',
 })
+
+/**
+ * Inspecteur du formulaire de MODIFICATION d'un lien.
+ * Même règles que la création, sauf deux différences :
+ *  - le code est obligatoire (un lien a toujours un code) ;
+ *  - "déjà utilisé" ignore le lien qu'on est en train de modifier.
+ */
+export const updateUrlValidator = vine.withMetaData<{ urlId: number }>().compile(
+  vine.object({
+    // ---- URL : mêmes règles qu'à la création ----
+    url: vine
+      .string()
+      .trim()
+      .maxLength(2048)
+      .url({
+        require_protocol: true,
+        protocols: ['http', 'https'],
+      }),
+
+    // ---- Code : obligatoire cette fois (pas de .optional()) ----
+    shortCode: vine
+      .string()
+      .trim()
+      .minLength(3)
+      .maxLength(30)
+      .regex(/^[A-Za-z0-9_-]+$/)
+      .notIn(MOTS_RESERVES)
+      // field.meta.urlId = l'id du lien en cours de modification, transmis par le contrôleur.
+      // whereNot('id', ...) : on cherche un AUTRE lien qui aurait déjà ce code.
+      .unique(async (db, value, field) => {
+        const existant = await db
+          .from('short_urls')
+          .where('short_code', value)
+          .whereNot('id', field.meta.urlId)
+          .first()
+        return !existant
+      }),
+  })
+)
+
+// On réutilise exactement les mêmes messages que pour la création,
+// et on ajoute celui de la case code vide
+updateUrlValidator.messagesProvider = new SimpleMessagesProvider({
+  'url.required': 'Merci de saisir une URL.',
+  'url.maxLength': "L'URL est trop longue (2048 caractères maximum).",
+  'url.url': "L'URL doit être valide et commencer par http:// ou https://",
+
+  'shortCode.required': 'Le code court ne peut pas être vide.',
+  'shortCode.minLength': 'Le code doit contenir au moins 3 caractères.',
+  'shortCode.maxLength': 'Le code ne peut pas dépasser 30 caractères.',
+  'shortCode.regex': 'Le code ne peut contenir que des lettres, chiffres, - et _.',
+  'shortCode.notIn': 'Ce code est réservé, choisis-en un autre.',
+  'shortCode.database.unique': 'Ce code est déjà utilisé, choisis-en un autre.',
+})

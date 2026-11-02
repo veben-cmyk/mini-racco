@@ -32,8 +32,12 @@ router
 router.post('/shorten', [ShortUrlsController, 'shorten']).as('urls.shorten')
 // Page goToUrl : Affiche la page de test et la sidebar d'historique
 router.get('/go-to-url', [ShortUrlsController, 'goToUrl']).as('urls.goToUrl')
-// Suppression d'un lien
-router.post('/urls/:id', [ShortUrlsController, 'destroy']).as('urls.destroy')
+// Afficher le formulaire de modification d'un lien
+router.get('/urls/:id/edit', [ShortUrlsController, 'edit']).as('urls.edit')
+// Enregistrer la modification (PUT, via ?_method=PUT dans le formulaire)
+router.put('/urls/:id', [ShortUrlsController, 'update']).as('urls.update')
+// Supprimer un lien (DELETE, via ?_method=DELETE dans le formulaire)
+router.delete('/urls/:id', [ShortUrlsController, 'destroy']).as('urls.destroy')
 // deconnexion
 router.post('/logout', [AuthController, 'logout'])
     })

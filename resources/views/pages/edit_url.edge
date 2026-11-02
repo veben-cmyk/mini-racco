@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modifier un lien - Mini Racco</title>
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+
+    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+      Modifier le lien
+    </h1>
+
+    {{-- Messages de l'inspecteur pour chaque case (s'il y en a) --}}
+    @inputError('url')
+      @each(message in $messages)
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message }}</div>
+      @end
+    @end
+
+    @inputError('shortCode')
+      @each(message in $messages)
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message }}</div>
+      @end
+    @end
+
+    {{--
+      Le formulaire envoie un POST, mais ?_method=PUT dans l'adresse
+      demande à Adonis de le traiter comme un PUT (method spoofing).
+    --}}
+    <form action="{{ route('urls.update', { id: shortUrl.id }) }}?_method=PUT" method="POST" class="space-y-4">
+      {{ csrfField() }}
+
+      <div>
+        <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL d'origine</label>
+        {{--
+          old('url') : la valeur tapée avant une erreur de validation.
+          Sinon, on pré-remplit avec la valeur actuelle en base.
+        --}}
+        <input
+          type="url"
+          id="url"
+          name="url"
+          required
+          value="{{ old('url') || shortUrl.originalUrl }}"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label for="shortCode" class="block text-sm font-medium text-gray-700 mb-1">Code court</label>
+        <input
+          type="text"
+          id="shortCode"
+          name="shortCode"
+          required
+          value="{{ old('shortCode') || shortUrl.shortCode }}"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+        Enregistrer les modifications
+      </button>
+    </form>
+
+    {{-- Retour à la liste sans rien changer --}}
+    <p class="text-center text-sm mt-6">
+      <a href="{{ route('urls.goToUrl') }}" class="text-blue-600 hover:underline">← Annuler et revenir à mes liens</a>
+    </p>
+
+  </div>
+
+</body>
+</html>

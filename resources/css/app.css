@@ -1,2 +1,31 @@
+/* Charge Tailwind */
 @import "tailwindcss";
+
+/*
+  Charte Veben : chaque variable devient des classes Tailwind.
+  --color-calque  →  bg-calque, text-calque, border-calque...
+  --font-display  →  font-display
+*/
+@theme {
+  /* Couleurs */
+  --color-papier: #f4f4f1;        /* fond de page, blanc cassé */
+  --color-papier-releve: #ffffff; /* cartes et champs posés sur le fond */
+  --color-graphite: #1a1b1d;      /* texte principal */
+  --color-graphite-doux: #5c5e64; /* texte secondaire */
+  --color-trait: #d7d7d2;         /* bordures et séparateurs */
+  --color-calque: #2348c4;        /* bleu de la marque : boutons, liens */
+  --color-calque-pale: #dde4f8;   /* fond bleu léger */
+  --color-succes: #1f7a4d;        /* messages de réussite */
+  --color-erreur: #b8322a;        /* messages d'erreur */
+
+  /* Polices (chargées dans le layout depuis Google Fonts) */
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif; /* titres */
+  --font-sans: "Instrument Sans", -apple-system, "Segoe UI", sans-serif; /* texte */
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace; /* code */
+}
+
+/* Les titres Archivo en largeur 125 %, comme dans la charte */
+.font-display {
+  font-stretch: 125%;
+}
 

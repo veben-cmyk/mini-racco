@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {{-- Titre de l'onglet : chaque page peut passer le sien, sinon "Veben" --}}
+  <title>{{ title ? title + ' · Veben' : 'Veben' }}</title>
+
+  {{-- Polices de la charte : Archivo (titres), Instrument Sans (texte), JetBrains Mono (code) --}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="min-h-screen flex flex-col bg-papier text-graphite font-sans">
+
+  {{-- ===== En-tête : logo + navigation ===== --}}
+  <header class="border-b border-trait">
+    <nav class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+
+      {{-- Logo : le V en graphite, la pointe et le trait en bleu calque --}}
+      <a href="{{ route('urls.home') }}" class="flex items-center gap-2.5">
+        <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+          <path fill="#1a1b1d" d="M8 6H20L32 28L44 6H56L38.55 38H25.45Z"/>
+          <path fill="#2348c4" d="M27.09 41H36.91L32 50Z"/>
+          <path fill="#2348c4" d="M14 55H50V59H14Z"/>
+        </svg>
+        <span class="font-display font-semibold text-[15px] tracking-[0.14em]">VEBEN</span>
+      </a>
+
+      {{-- Menu : il change selon que l'utilisateur est connecté ou non --}}
+      <div class="flex flex-wrap items-center gap-2 text-[15px]">
+        @if(auth.user)
+          {{-- Membre connecté --}}
+          <a href="{{ route('urls.goToUrl') }}" class="px-3 py-2 text-graphite-doux hover:text-graphite">Mes liens</a>
+          <span class="px-3 py-2 text-graphite-doux">{{ auth.user.username }}</span>
+          {{-- La déconnexion est un POST : un simple lien (GET) ne doit jamais modifier l'état --}}
+          <form action="/logout" method="POST">
+            {{ csrfField() }}
+            <button type="submit" class="px-4 py-2 border border-trait rounded-xl bg-papier-releve font-medium hover:border-graphite cursor-pointer">
+              Déconnexion
+            </button>
+          </form>
+        @else
+          {{-- Visiteur --}}
+          <a href="/login" class="px-3 py-2 hover:text-calque">Se connecter</a>
+          <a href="/register" class="px-4 py-2 border border-trait rounded-xl bg-papier-releve font-medium hover:border-graphite">
+            Créer un compte
+          </a>
+        @end
+      </div>
+    </nav>
+  </header>
+
+  {{-- ===== Contenu de la page ===== --}}
+  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-16">
+
+    {{-- Message de succès (création, modification, suppression...), commun à toutes les pages --}}
+    @if(flashMessages.has('success'))
+      <p class="mb-8 px-4 py-3 rounded-xl bg-papier-releve border border-trait text-succes text-sm">
+        {{ flashMessages.get('success') }}
+      </p>
+    @end
+
+    {{-- Le "trou" : ici s'affiche le contenu propre à chaque page --}}
+    {{{ await $slots.main() }}}
+  </main>
+
+  {{-- ===== Pied de page ===== --}}
+  <footer class="border-t border-trait">
+    <p class="max-w-5xl mx-auto px-6 py-6 text-[13px] text-graphite-doux">© Isaac Veben</p>
+  </footer>
+
+</body>
+</html>
