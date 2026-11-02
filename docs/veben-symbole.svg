@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Veben">
+  <!-- Le V en graphite -->
+  <path fill="#1a1b1d" d="M8 6H20L32 28L44 6H56L38.55 38H25.45Z"/>
+  <!-- La pointe du crayon et le trait, en bleu calque -->
+  <path fill="#2348c4" d="M27.09 41H36.91L32 50Z"/>
+  <path fill="#2348c4" d="M14 55H50V59H14Z"/>
+</svg>
+
+<!-- theme sombre  -->
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Veben">
+  <!-- Le V en papier (clair), lisible sur fond sombre -->
+  <path fill="#ecece8" d="M8 6H20L32 28L44 6H56L38.55 38H25.45Z"/>
+  <!-- La pointe et le trait en calque clair, la version sombre de ton bleu -->
+  <path fill="#7d9bff" d="M27.09 41H36.91L32 50Z"/>
+  <path fill="#7d9bff" d="M14 55H50V59H14Z"/>
+</svg>
