@@ -24,13 +24,23 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
-    DB_HOST: Env.schema.string({ format: 'host' }),
-    DB_PORT: Env.schema.number(),
-    DB_USER: Env.schema.string(),
-    DB_PASSWORD: Env.schema.string(),
-    DB_DATABASE: Env.schema.string.optional(),
-      // Compte administrateur créé par le seeder (node ace db:seed)
-    ADMIN_USERNAME: Env.schema.string.optional(),
-    ADMIN_EMAIL: Env.schema.string.optional(),
-    ADMIN_PASSWORD: Env.schema.string.optional(),
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string.optional(),
+  DB_DATABASE: Env.schema.string(),
+  // Compte administrateur créé par le seeder (node ace db:seed)
+  ADMIN_USERNAME: Env.schema.string.optional(),
+  ADMIN_EMAIL: Env.schema.string.optional(),
+  ADMIN_PASSWORD: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the mail package
+  |----------------------------------------------------------
+  */
+  BREVO_API_KEY: Env.schema.string(),
+  // Expéditeur des emails : l'adresse validée dans Brevo
+  MAIL_FROM_ADDRESS: Env.schema.string({ format: 'email' }),
+  MAIL_FROM_NAME: Env.schema.string(),
 })
