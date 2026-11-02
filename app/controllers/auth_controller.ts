@@ -44,10 +44,12 @@ export default class AuthController {
    */
     async login({ request, response, auth, session }: HttpContext) {
         const { email, password } = request.only(['email', 'password'])
+        // Même règle qu'à l'inscription : on compare toujours l'email en minuscules
+        const emailNormalise = String(email ?? '').trim().toLowerCase()
 
         try {
         // Vérifie les identifiants et connecte l'utilisateur
-            const user = await User.verifyCredentials(email, password)
+            const user = await User.verifyCredentials(emailNormalise, password)
             await auth.use('web').login(user)
 
             return response.redirect().toPath('/')

@@ -1,76 +1,58 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modifier un lien - Mini Racco</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+{{-- Modification d'un lien : direction A --}}
+@layout({ title: 'Modifier un lien' })
 
-  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+  <div class="max-w-md mx-auto flex flex-col gap-8">
 
-    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-      Modifier le lien
-    </h1>
+    <div class="flex flex-col items-center gap-3 text-center">
+      <p class="font-display font-semibold text-xs tracking-[0.14em] text-graphite-doux">MODIFIER</p>
+      {{-- On rappelle quel lien est en cours de modification --}}
+      <h1 class="font-display font-semibold text-3xl break-all">/{{ shortUrl.shortCode }}</h1>
+    </div>
 
-    {{-- Messages de l'inspecteur pour chaque case (s'il y en a) --}}
-    @inputError('url')
-      @each(message in $messages)
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message }}</div>
-      @end
-    @end
-
-    @inputError('shortCode')
-      @each(message in $messages)
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message }}</div>
-      @end
-    @end
-
-    {{--
-      Le formulaire envoie un POST, mais ?_method=PUT dans l'adresse
-      demande à Adonis de le traiter comme un PUT (method spoofing).
-    --}}
-    <form action="{{ route('urls.update', { id: shortUrl.id }) }}?_method=PUT" method="POST" class="space-y-4">
+    {{-- POST déguisé en PUT grâce à ?_method=PUT --}}
+    <form action="{{ route('urls.update', { id: shortUrl.id }) }}?_method=PUT" method="POST"
+      class="flex flex-col gap-5 p-8 rounded-xl bg-papier-releve border border-trait">
       {{ csrfField() }}
 
-      <div>
-        <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL d'origine</label>
-        {{--
-          old('url') : la valeur tapée avant une erreur de validation.
-          Sinon, on pré-remplit avec la valeur actuelle en base.
-        --}}
-        <input
-          type="url"
-          id="url"
-          name="url"
-          required
+      {{-- URL d'origine : pré-remplie avec la valeur actuelle --}}
+      <div class="flex flex-col gap-2">
+        <label for="url" class="text-[13px] font-medium text-graphite-doux">Adresse d'origine</label>
+        {{-- Après une erreur : la valeur tapée (old). Sinon : la valeur en base. --}}
+        <input type="url" id="url" name="url" required
           value="{{ old('url') || shortUrl.originalUrl }}"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="px-4 py-3 rounded-xl bg-papier-releve border border-trait outline-none focus:border-calque focus:ring-2 focus:ring-calque/20">
+        @inputError('url')
+          @each(message in $messages)
+            <p class="text-[13px] text-erreur">{{ message }}</p>
+          @end
+        @end
       </div>
 
-      <div>
-        <label for="shortCode" class="block text-sm font-medium text-gray-700 mb-1">Code court</label>
-        <input
-          type="text"
-          id="shortCode"
-          name="shortCode"
-          required
-          value="{{ old('shortCode') || shortUrl.shortCode }}"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      {{-- Code court : avec le préfixe, comme sur l'accueil --}}
+      <div class="flex flex-col gap-2">
+        <label for="shortCode" class="text-[13px] font-medium text-graphite-doux">Code court</label>
+        <div class="flex items-center rounded-xl bg-papier-releve border border-trait focus-within:border-calque focus-within:ring-2 focus-within:ring-calque/20">
+          <span class="pl-4 font-mono text-sm text-graphite-doux">{{ request.host() }}/</span>
+          <input type="text" id="shortCode" name="shortCode" required
+            value="{{ old('shortCode') || shortUrl.shortCode }}"
+            class="flex-1 min-w-0 pr-4 py-3 bg-transparent font-mono text-[15px] outline-none">
+        </div>
+        @inputError('shortCode')
+          @each(message in $messages)
+            <p class="text-[13px] text-erreur">{{ message }}</p>
+          @end
+        @end
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
-        Enregistrer les modifications
+      <button type="submit" class="mt-2 py-3 rounded-xl bg-calque text-white font-semibold hover:opacity-90 cursor-pointer">
+        Enregistrer
       </button>
     </form>
 
-    {{-- Retour à la liste sans rien changer --}}
-    <p class="text-center text-sm mt-6">
-      <a href="{{ route('urls.goToUrl') }}" class="text-blue-600 hover:underline">← Annuler et revenir à mes liens</a>
-    </p>
-
+    {{-- Annuler : retour à la liste sans rien changer --}}
+    <a href="{{ route('urls.goToUrl') }}" class="text-center text-[15px] text-graphite-doux hover:text-graphite">
+      ← Annuler et revenir à mes liens
+    </a>
   </div>
 
-</body>
-</html>
+@end

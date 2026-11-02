@@ -21,12 +21,15 @@ export const registerValidator = vine.compile(
       .string()
       .trim()
       .email() // règle 1 : format nom@domaine.com
-      .normalizeEmail({ all_lowercase: true }) // règle 2 : tout en minuscules
+       // Règle 2 : tout en minuscules, sans rien modifier d'autre.
+      // (normalizeEmail retirait aussi les points des adresses Gmail :
+      //  jaden.veben@gmail.com devenait jadenveben@gmail.com)
+        .toLowerCase()
       // Règle 3 : on vérifie que l'email n'a pas déjà un compte
-      .unique(async (db, value) => {
+        .unique(async (db, value) => {
         const existant = await db.from('users').where('email', value).first()
         return !existant
-      }),
+    }),
 
     // ---- Mot de passe ----
     // Pas de trim() ici : un espace peut faire partie d'un mot de passe volontairement

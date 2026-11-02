@@ -1,77 +1,47 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion - Mini Racco</title>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex items-center justify-center p-6">
+{{-- Page de connexion : direction A, carte centrée --}}
+@layout({ title: 'Connexion' })
 
-  <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-    
-    <!-- En-tête -->
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-bold text-slate-900 mb-1">Connexion</h1>
-      <p class="text-sm text-slate-500">Accédez à votre espace Mini Racco</p>
+  <div class="max-w-md mx-auto flex flex-col gap-8">
+
+    {{-- Titre --}}
+    <div class="flex flex-col items-center gap-3 text-center">
+      <p class="font-display font-semibold text-xs tracking-[0.14em] text-graphite-doux">CONNEXION</p>
+      <h1 class="font-display font-semibold text-3xl">Bon retour.</h1>
     </div>
 
-    <!-- Message d'erreur -->
-    @if(flashMessages.has('errors.login'))
-      <div class="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
-        {{ flashMessages.get('errors.login') }}
-      </div>
-    @endif
-
-    <!-- Formulaire de connexion -->
-    <form action="/login" method="POST" class="space-y-5">
+    {{-- La carte du formulaire --}}
+    <form action="/login" method="POST" class="flex flex-col gap-5 p-8 rounded-xl bg-papier-releve border border-trait">
       {{ csrfField() }}
 
-      <div>
-        <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">
-          Adresse email
-        </label>
-        <input 
-          type="email" 
-          id="email" 
-          name="email" 
-          placeholder="nom@exemple.com" 
-          required
-          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all"
-        >
+      {{-- Erreur de connexion (email ou mot de passe incorrect) --}}
+      @if(flashMessages.has('errors.login'))
+        <p class="text-[13px] text-erreur">{{ flashMessages.get('errors.login') }}</p>
+      @end
+
+      <div class="flex flex-col gap-2">
+        <label for="email" class="text-[13px] font-medium text-graphite-doux">Adresse email</label>
+        {{-- old('email') : on garde l'email tapé si la connexion échoue --}}
+        <input type="email" id="email" name="email" required autocomplete="email"
+          value="{{ old('email') || '' }}" placeholder="nom@exemple.com"
+          class="px-4 py-3 rounded-xl bg-papier-releve border border-trait outline-none focus:border-calque focus:ring-2 focus:ring-calque/20">
       </div>
 
-      <div>
-        <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">
-          Mot de passe
-        </label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          placeholder="••••••••" 
-          required
-          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all"
-        >
+      <div class="flex flex-col gap-2">
+        <label for="password" class="text-[13px] font-medium text-graphite-doux">Mot de passe</label>
+        {{-- Jamais de old() sur un mot de passe : on ne le renvoie pas au navigateur --}}
+        <input type="password" id="password" name="password" required autocomplete="current-password"
+          class="px-4 py-3 rounded-xl bg-papier-releve border border-trait outline-none focus:border-calque focus:ring-2 focus:ring-calque/20">
       </div>
 
-      <button 
-        type="submit" 
-        class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm mt-2"
-      >
+      <button type="submit" class="mt-2 py-3 rounded-xl bg-calque text-white font-semibold hover:opacity-90 cursor-pointer">
         Se connecter
       </button>
     </form>
 
-    <!-- Pied de carte -->
-    <div class="mt-6 text-center text-sm text-slate-500">
-      Pas encore de compte ? 
-      <a href="/register" class="text-indigo-600 font-semibold hover:underline ml-1">
-        S'inscrire
-      </a>
-    </div>
-
+    <p class="text-center text-[15px] text-graphite-doux">
+      Pas encore de compte ?
+      <a href="/register" class="text-calque font-medium hover:underline">Créer un compte</a>
+    </p>
   </div>
 
-</body>
-</html>
+@end
