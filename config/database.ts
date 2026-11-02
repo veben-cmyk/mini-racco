@@ -13,6 +13,8 @@ const dbConfig = defineConfig({
         user: env.get('DB_USER'),
         password: env.get('DB_PASSWORD'),
         database: env.get('DB_DATABASE'),
+          // Connexion chiffrée si DB_SSL=true (en ligne), en clair sinon (sur le Mac)
+        ssl: env.get('DB_SSL') ? { rejectUnauthorized: true } : false,
       },
       migrations: {
         naturalSort: true,

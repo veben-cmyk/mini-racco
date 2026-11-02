@@ -18,6 +18,11 @@ export const appKey = new Secret(env.get('APP_KEY'))
 export const http = defineConfig({
   generateRequestId: true,
   allowMethodSpoofing: true,
+  /**
+   * Sur Render, un proxy reçoit les requêtes en HTTPS puis les transmet à l'app.
+   * On lui fait confiance pour connaître le vrai protocole (https) et l'adresse du visiteur.
+   */
+  trustProxy: () => true,
 
   /**
    * Enabling async local storage will let you access HTTP context
