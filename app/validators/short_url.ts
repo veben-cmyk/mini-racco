@@ -2,7 +2,8 @@ import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
 // Règle 3 : la liste des mots déjà utilisés par les pages du site.
 // Un lien "/login" ne marcherait jamais, car la page de connexion passe avant.
-const MOTS_RESERVES = ['login', 'register', 'logout', 'shorten', 'go-to-url', 'urls']
+// Mots interdits comme code court : ils correspondent déjà à des routes de l'app
+const MOTS_RESERVES = ['login', 'register', 'logout', 'shorten', 'go-to-url', 'urls', 'admin']
 
 // L'inspecteur : il vérifie les deux cases du formulaire
 export const shortenUrlValidator = vine.compile(

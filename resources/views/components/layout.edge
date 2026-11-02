@@ -31,16 +31,24 @@
       {{-- Menu : il change selon que l'utilisateur est connecté ou non --}}
       <div class="flex flex-wrap items-center gap-2 text-[15px]">
         @if(auth.user)
-          {{-- Membre connecté --}}
-          <a href="{{ route('urls.goToUrl') }}" class="px-3 py-2 text-graphite-doux hover:text-graphite">Mes liens</a>
-          <span class="px-3 py-2 text-graphite-doux">{{ auth.user.username }}</span>
+
+        {{-- Membre connecté --}}
+
+            {{-- Lien visible uniquement par les admins --}}
+            @if(auth.user.role === 'admin')
+                <a href="{{ route('admin.index') }}" class="px-3 py-2 text-calque font-medium">Administration</a>
+            @end
+            {{-- Lien vers la page "Mes liens" --}}
+            <a href="{{ route('urls.goToUrl') }}" class="px-3 py-2 text-graphite-doux hover:text-graphite">Mes liens</a>
+            <span class="px-3 py-2 text-graphite-doux">{{ auth.user.username }}</span>
+
           {{-- La déconnexion est un POST : un simple lien (GET) ne doit jamais modifier l'état --}}
-          <form action="/logout" method="POST">
-            {{ csrfField() }}
-            <button type="submit" class="px-4 py-2 border border-trait rounded-xl bg-papier-releve font-medium hover:border-graphite cursor-pointer">
-              Déconnexion
-            </button>
-          </form>
+            <form action="/logout" method="POST">
+                {{ csrfField() }}
+                <button type="submit" class="px-4 py-2 border border-trait rounded-xl bg-papier-releve font-medium hover:border-graphite cursor-pointer">
+                    Déconnexion
+                </button>
+            </form>
         @else
           {{-- Visiteur --}}
           <a href="/login" class="px-3 py-2 hover:text-calque">Se connecter</a>
@@ -59,6 +67,13 @@
     @if(flashMessages.has('success'))
       <p class="mb-8 px-4 py-3 rounded-xl bg-papier-releve border border-trait text-succes text-sm">
         {{ flashMessages.get('success') }}
+      </p>
+    @end
+
+    {{-- Message du vigile role quand un non-admin tente d'accéder à /admin --}}
+    @if(flashMessages.has('errors.role'))
+      <p class="mb-8 px-4 py-3 rounded-xl bg-papier-releve border border-trait text-erreur text-sm">
+        {{ flashMessages.get('errors.role') }}
       </p>
     @end
 

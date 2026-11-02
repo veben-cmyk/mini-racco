@@ -1,0 +1,104 @@
+{{--
+  Tableau de bord administrateur : direction A.
+  Reçoit du contrôleur :
+   - liens : TOUS les liens, avec leur propriétaire (lien.user)
+   - utilisateurs : tous les comptes, avec leur nombre de liens
+--}}
+@layout({ title: 'Administration' })
+
+  <div class="flex flex-col gap-16">
+
+    {{-- ===== En-tête ===== --}}
+    <div class="flex flex-col gap-2">
+      <p class="font-display font-semibold text-xs tracking-[0.14em] text-graphite-doux">ADMINISTRATION</p>
+      <h1 class="font-display font-semibold text-3xl">Vue d'ensemble</h1>
+      {{-- Deux chiffres clés --}}
+      <p class="text-graphite-doux">
+        {{ utilisateurs.length }} {{ utilisateurs.length > 1 ? 'comptes' : 'compte' }}
+        · {{ liens.length }} {{ liens.length > 1 ? 'liens' : 'lien' }}
+      </p>
+    </div>
+
+    {{-- ===== Section 1 : tous les liens (modération) ===== --}}
+    <section class="flex flex-col gap-4">
+      <h2 class="font-display font-semibold text-xl">Tous les liens</h2>
+
+      {{-- overflow-x-auto : sur téléphone, le tableau défile horizontalement au lieu de déborder --}}
+      <div class="overflow-x-auto rounded-xl bg-papier-releve border border-trait">
+        <table class="w-full text-left text-[15px]">
+          <thead class="text-[13px] text-graphite-doux border-b border-trait">
+            <tr>
+              <th class="px-4 py-3 font-medium">Code</th>
+              <th class="px-4 py-3 font-medium">Adresse d'origine</th>
+              <th class="px-4 py-3 font-medium">Propriétaire</th>
+              <th class="px-4 py-3 font-medium">Créé le</th>
+              <th class="px-4 py-3 font-medium"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(lien in liens)
+              <tr class="border-b border-trait last:border-0">
+                <td class="px-4 py-3 font-mono text-calque">/{{ lien.shortCode }}</td>
+                {{-- max-w + truncate : une URL très longue est coupée avec "…" --}}
+                <td class="px-4 py-3 max-w-xs truncate text-graphite-doux" title="{{ lien.originalUrl }}">
+                  {{ lien.originalUrl }}
+                </td>
+                {{-- lien.user est disponible grâce au preload('user') du contrôleur --}}
+                <td class="px-4 py-3">{{ lien.user ? lien.user.username : '—' }}</td>
+                <td class="px-4 py-3 text-graphite-doux">{{ lien.createdAt.toFormat('dd/MM/yyyy') }}</td>
+                <td class="px-4 py-3 text-right">
+                  {{-- Suppression d'un lien de n'importe qui : POST déguisé en DELETE --}}
+                  <form action="{{ route('admin.links.destroy', { id: lien.id }) }}?_method=DELETE" method="POST"
+                    onsubmit="return confirm('Supprimer ce lien pour son propriétaire ?')">
+                    {{ csrfField() }}
+                    <button type="submit" class="font-medium text-erreur hover:underline cursor-pointer">Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+            @else
+              <tr><td colspan="5" class="px-4 py-8 text-center text-graphite-doux">Aucun lien pour l'instant.</td></tr>
+            @end
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {{-- ===== Section 2 : tous les utilisateurs ===== --}}
+    <section class="flex flex-col gap-4">
+      <h2 class="font-display font-semibold text-xl">Comptes</h2>
+
+      <div class="overflow-x-auto rounded-xl bg-papier-releve border border-trait">
+        <table class="w-full text-left text-[15px]">
+          <thead class="text-[13px] text-graphite-doux border-b border-trait">
+            <tr>
+              <th class="px-4 py-3 font-medium">Nom</th>
+              <th class="px-4 py-3 font-medium">Email</th>
+              <th class="px-4 py-3 font-medium">Rôle</th>
+              <th class="px-4 py-3 font-medium">Liens</th>
+              <th class="px-4 py-3 font-medium">Inscrit le</th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(utilisateur in utilisateurs)
+              <tr class="border-b border-trait last:border-0">
+                <td class="px-4 py-3">{{ utilisateur.username }}</td>
+                <td class="px-4 py-3 text-graphite-doux">{{ utilisateur.email }}</td>
+                <td class="px-4 py-3">
+                  {{-- Pastille : bleue pour un admin, neutre pour un utilisateur --}}
+                  <span class="px-2 py-0.5 rounded-full text-[13px] {{ utilisateur.role === 'admin' ? 'bg-calque-pale text-calque' : 'bg-papier text-graphite-doux' }}">
+                    {{ utilisateur.role }}
+                  </span>
+                </td>
+                {{-- Le compteur ajouté par withCount('shortUrls') --}}
+                <td class="px-4 py-3">{{ utilisateur.$extras.shortUrls_count }}</td>
+                <td class="px-4 py-3 text-graphite-doux">{{ utilisateur.createdAt.toFormat('dd/MM/yyyy') }}</td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+@end

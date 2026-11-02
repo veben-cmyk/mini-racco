@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+const AdminController = () => import('#controllers/admin_controller')
 const ShortUrlsController = () => import('#controllers/short_urls_controller')
 
 const AuthController = () => import('#controllers/auth_controller')
@@ -43,7 +44,23 @@ router.post('/logout', [AuthController, 'logout'])
     })
     .use(middleware.auth())
 
-// --- 3. Routes publiques ---
+// --- 3. Routes d'administration ---
+// Deux vigiles, dans cet ordre :
+//   1. auth : es-tu connecté ? (sinon → /login)
+//   2. role : as-tu le badge admin ? (sinon → accueil)
+router
+  .group(() => {
+    // Tableau de bord : tous les liens et tous les utilisateurs
+    router.get('/', [AdminController, 'index']).as('admin.index')
+    // Supprimer n'importe quel lien (modération)
+    router.delete('/links/:id', [AdminController, 'destroyLink']).as('admin.links.destroy')
+  })
+  // .prefix ajoute "/admin" devant chaque route du groupe :
+  // '/' devient '/admin', '/links/:id' devient '/admin/links/:id'
+  .prefix('/admin')
+  .use([middleware.auth(), middleware.role({ roles: ['admin'] })])
+
+// --- 4. Routes publiques ---
 // Accueil : visible par tous, la création d'un lien exigera d'être connecté
 // Page d'accueil : Affiche le formulaire
 router.get('/', [ShortUrlsController, 'index']).as('urls.home')

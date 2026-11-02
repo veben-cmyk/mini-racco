@@ -37,9 +37,9 @@ router.use([
   () => import('@adonisjs/session/session_middleware'),
   () => import('@adonisjs/shield/shield_middleware'),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
-   // Vérifie sur CHAQUE page qui est connecté, sans bloquer personne.
+  // Vérifie sur CHAQUE page qui est connecté, sans bloquer personne.
   // Permet à la navigation d'afficher le bon menu, même sur les pages publiques.
-    () => import('@adonisjs/auth/initialize_auth_middleware'),
+  () => import('@adonisjs/auth/initialize_auth_middleware'),
 ])
 
 /**
@@ -48,5 +48,7 @@ router.use([
  */
 export const middleware = router.named({
   guest: () => import('#middleware/guest_middleware'),
-  auth: () => import('#middleware/auth_middleware')
+  auth: () => import('#middleware/auth_middleware'),
+  // Vigile de rôle : middleware.role({ roles: ['admin'] })
+  role: () => import('#middleware/role_middleware'),
 })
